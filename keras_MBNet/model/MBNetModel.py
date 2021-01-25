@@ -230,19 +230,24 @@ class MBNetModel(Base_model):
 		print('loaded lwir video from :' + lwir_test_file)
 
 		vid = cv2.VideoCapture(test_file)
-
 		lwir_vid = cv2.VideoCapture(lwir_test_file)
-		fps = vid.get(cv2.CAP_PROP_FPS)
 
+		fps = vid.get(cv2.CAP_PROP_FPS)
+		frame_all = vid.get(cv2.CAP_PROP_FRAME_COUNT)
+
+		print("[INFO] 视频FPS: {}".format(fps))
+		print("[INFO] 视频总帧数: {}".format(frame_all))
+		print("[INFO] 视频时长: {}s".format(frame_all/fps))
+		
 		frame_width = int(vid.get(3))
 		frame_height = int(vid.get(4))
-		out_vid = cv2.VideoWriter('output_vid.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps,
+		out_vid = cv2.VideoWriter('./output_videos/output_visible.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps,
 								  (frame_width, frame_height))
-		out_lwir_vid = cv2.VideoWriter('output_lwir_vid.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps,
+		out_lwir_vid = cv2.VideoWriter('./output_videos/output_lwir.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps,
 									   (frame_width, frame_height))
 		idx = 0
-
-		while True:
+		
+		while idx < frame_all: #防止越界
 			ret , frame = vid.read()
 
 			lwir_ret, lwir_frame = lwir_vid.read()
@@ -262,6 +267,7 @@ class MBNetModel(Base_model):
 
 			out_vid.write(frame)
 			out_lwir_vid.write(lwir_frame)
+			idx += 1
 
 		vid.release()
 		lwir_vid.release()
